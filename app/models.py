@@ -4,6 +4,7 @@ from . import db
 from flask import current_app, url_for
 from itsdangerous.url_safe import URLSafeTimedSerializer as Serializer
 
+
 class User(db.Model):
     __tablename__ = "User"
     email = db.Column(db.String(320), primary_key=True)
@@ -11,6 +12,7 @@ class User(db.Model):
     f_name = db.Column(db.String(20))
     l_name = db.Column(db.String(20))
     location = db.Column(db.String(64))
+    reported = db.Column(db.Integer)
 
     @staticmethod
     def from_json(json_user):
@@ -57,3 +59,63 @@ class User(db.Model):
         except:
             return None
         return User.query.get(data["email"])
+
+
+class Item(db.Model):
+    __tablename__ = "Item"
+    item_id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(320))
+    name = db.Column(db.String(30))
+    description = db.COLUMN(db.String(200))
+    location = db.Column(db.String(64))
+    reported = db.Column(db.Integer)
+
+    @staticmethod
+    def from_json(json_item):
+        item_id = json_item.get("item_id")
+        email = json_item.get("email")
+        name = json_item.get("name")
+        description = json_item.get("description")
+        location = json_item.get("location")
+        if item_id is None:
+            raise ValueError("Item doesn't have an ID")
+        return Item(item_id=item_id, email=email, name=name, description=description, location=location, reported=0)
+
+    def to_json(self):
+        json_item = {
+            "item_id": self.item_id,
+            "email": self.email,
+            "name": self.name,
+            "description": self.description,
+            "location": self.location,
+        }
+        return json_item
+
+
+class Conversation(db.Model):
+    __tablename__ = "Conversation"
+    chat_id = db.Column(db.Integer, primary_key=True)
+    email1 = db.Column(db.String(320))
+    email2 = db.Column(db.String(320))
+    item_id = db.Column(db.Integer)
+
+    def to_json(self):
+        json_conversation = {
+            "chat_id": self.chat_id,
+            "email1": self.email1,
+            "email2": self.email2,
+            "item_id": self.item_id,
+        }
+
+        return json_conversation
+
+    @staticmethod
+    def from_json(json_conv):
+        chat_id = json_conv.get("chat_id")
+        email1 = json_conv.get("email1")
+        email2 = json_conv.get("email2")
+        item_id = json_conv.get("item_id")
+        if chat_id is None:
+            raise ValueError("Conversation does not have an ID")
+        return Item(chat_id=chat_id, email1=email1, email2=email2, item_id=item_id)
+
