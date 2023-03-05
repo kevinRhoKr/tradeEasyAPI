@@ -66,7 +66,7 @@ class Item(db.Model):
     item_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(320))
     name = db.Column(db.String(30))
-    description = db.COLUMN(db.String(200))
+    description = db.Column(db.String(200))
     location = db.Column(db.String(64))
     reported = db.Column(db.Integer)
 

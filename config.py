@@ -18,7 +18,7 @@ class Config:
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres:098u123e@localhost:5432/tradeEasy"
+    SQLALCHEMY_DATABASE_URI = "postgresql+psycopg2://postgres:password@tradeeasy-postgres.cmvvqltryuil.us-east-1.rds.amazonaws.com"
 
 
 # class TestingConfig(Config):
