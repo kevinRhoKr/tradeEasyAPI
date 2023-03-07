@@ -4,6 +4,7 @@ from . import auth
 from ..errors import bad_request
 from .. import db
 
+
 @auth.route('/')
 def hello():
     return jsonify({"Hello World!": 1})
@@ -44,9 +45,3 @@ def signUp():
     db.session.commit()
 
     return jsonify(user.to_json()), 201
-
-
-
-
-
-
