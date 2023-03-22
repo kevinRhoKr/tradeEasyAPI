@@ -1,8 +1,9 @@
 from flask import jsonify, request
 from ..models import User
 from . import auth
-from ..errors import bad_request
+from ..errors import bad_request, not_found, unauthorized
 from .. import db
+from flask_jwt_extended import create_access_token, unset_jwt_cookies, get_jwt_identity, jwt_required
 
 
 @auth.route('/')
@@ -14,6 +15,39 @@ def hello():
 def getAll():
     users = User.query.all()
     response = jsonify({"Users": [user.to_json() for user in users]})
+    return response
+
+
+@auth.route("/login", methods=["POST"])
+def login_call():
+    email = request.json.get("inputObj").get("email", None)
+    password = request.json.get("inputObj").get("password", None)
+    # if username != "test" or password != "test":
+    #     return jsonify({"msg": "Bad username or password"}), 401
+
+    curr_user = User.query.filter_by(email=email).first()
+    if not curr_user:
+        return not_found("User not found")
+
+    if not curr_user.verify_password(password):
+        return unauthorized("Invalid credentials")
+
+    access_token = create_access_token(identity=email)
+    # print(access_token)
+    return jsonify(access_token=access_token)
+
+
+@auth.route("/logout", methods=["POST"])
+def logout_call():
+    print("before")
+    response = jsonify({"msg": "logout successful"})
+    print("0", response)
+    # print(get_jwt_identity())
+    print("1")
+    unset_jwt_cookies(response)
+    print("2")
+    # print(get_jwt_identity())
+    print("3")
     return response
 
 
