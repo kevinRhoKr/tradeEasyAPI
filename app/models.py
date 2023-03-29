@@ -62,7 +62,7 @@ class User(db.Model):
 
 
 class Item(db.Model):
-    __tablename__ = "Item"
+    __tablename__ = "item"
     item_id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(320))
     name = db.Column(db.String(30))
@@ -93,7 +93,7 @@ class Item(db.Model):
 
 
 class Conversation(db.Model):
-    __tablename__ = "Conversation"
+    __tablename__ = "conversation"
     chat_id = db.Column(db.Integer, primary_key=True)
     email1 = db.Column(db.String(320))
     email2 = db.Column(db.String(320))
@@ -119,3 +119,24 @@ class Conversation(db.Model):
             raise ValueError("Conversation does not have an ID")
         return Item(chat_id=chat_id, email1=email1, email2=email2, item_id=item_id)
 
+
+class Likes(db.Model):
+    __tablename__ = "likes"
+    email = db.Column(db.String(320), primary_key=True)
+    item_id = db.Column(db.Integer, primary_key=True)
+
+    def to_json(self):
+        json_conversation = {
+            "email": self.email,
+            "item_id": self.item_id,
+        }
+
+        return json_conversation
+
+    @staticmethod
+    def from_json(json_conv):
+        email = json_conv.get("email")
+        item_id = json_conv.get("item_id")
+        if email is None or item_id is None:
+            raise ValueError("Cannot get the interest information")
+        return Item(email=email, item_id=item_id)
