@@ -11,8 +11,10 @@ class User(db.Model):
     password_hash = db.Column(db.String(128))
     f_name = db.Column(db.String(20))
     l_name = db.Column(db.String(20))
-    location = db.Column(db.String(64))
-    reported = db.Column(db.Integer)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    proximity = db.Column(db.Integer)
+    reported = db.Column(db.Integer, default=0)
 
     @staticmethod
     def from_json(json_user):
@@ -67,7 +69,6 @@ class Item(db.Model):
     email = db.Column(db.String(320))
     name = db.Column(db.String(30))
     description = db.Column(db.String(200))
-    location = db.Column(db.String(64))
     reported = db.Column(db.Integer)
 
     @staticmethod

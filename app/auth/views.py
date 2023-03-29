@@ -55,13 +55,19 @@ def logout_call():
 def signUp():
     signUpDetails = request.json.get("register_details")
     '''
-        register_details = {
-                            email: email
-                            password:password
-                            fname: f_name
-                            lname: l_name
-                            location: location
+    
+        {
+        "register_details": {
+                            "email": email,
+                            "password": password,
+                            "fname": f_name,
+                            "lname": l_name,
+                            "latitude": location1,
+                            "longitude": location2, 
+                            "proximity": proximity
                         }
+        }
+                        
         '''
 
     same_email_user = User.query.filter_by(email=signUpDetails.get("email")).first()
@@ -73,7 +79,9 @@ def signUp():
     user.password = signUpDetails.get("password")
     user.f_name = signUpDetails.get("fname")
     user.l_name = signUpDetails.get("lname")
-    user.location = signUpDetails.get("location")
+    user.latitude = signUpDetails.get("latitude")
+    user.longitude = signUpDetails.get("longitude")
+    user.proximity = signUpDetails.get("proximity")
 
     db.session.add(user)
     db.session.commit()
