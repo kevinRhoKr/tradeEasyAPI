@@ -30,6 +30,25 @@ def likeAnItem():
     return bad_request("Cannot find a particular item with the given item ID")
 
 
+@api.route("/reportItem", methods=["PUT"])
+@jwt_required()
+def reportItem():
+    item_id = request.json["item_id"]
+    Item.query.filter_by(item_id=item_id).update(dict(reported=1))
+    db.session.commit()
+
+    return jsonify({'Reported item': 'Success'})
+
+
+@api.route("/reportUser", methods=["PUT"])
+@jwt_required()
+def reportUser():
+    email = request.json["email"]
+    User.query.filter_by(email=email).update(dict(reported=1))
+    db.session.commit()
+
+    return jsonify({'Reported user': 'Success'})
+
 #TODO: JONATHAN
 @api.route("/myposts/")
 @jwt_required()
