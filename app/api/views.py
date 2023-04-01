@@ -4,6 +4,7 @@ from flask import jsonify, request, url_for
 from .. import db
 from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from geopy.distance import geodesic
 
 # TODO: Start writing the api endpoints
 # api endpoints:
@@ -49,24 +50,74 @@ def reportUser():
 
     return jsonify({'Reported user': 'Success'})
 
+
+@api.route("/changeLocation", methods=["PUT"])
+@jwt_required()
+def changeLocation():
+    email = get_jwt_identity()
+    longitude = request.json["longitude"]
+    latitude = request.json["latitude"]
+    User.query.filter_by(email=email).update(dict(latitude=latitude, longitude=longitude))
+    db.session.commit()
+
+    return jsonify({"Msg": "success"})
+
+
+@api.route("changeProximity", methods=["PUT"])
+@jwt_required()
+def changeProximity():
+    email = get_jwt_identity()
+    proximity = request.json["proximity"]
+    User.query.filter_by(email=email).update(dict(proximity=proximity))
+    db.session.commit()
+
+    return jsonify({"Msg": "success"})
+
+
+@api.route("/getItems")
+@jwt_required()
+def getAppropriateItems():
+
+    def withinDistance(orig_lat, orig_long, dst_lat, dst_long, proximity): # in miles
+
+        origin = (orig_lat, orig_long)
+        dist = (dst_lat, dst_long)
+
+        return geodesic(origin, dist).miles < proximity
+
+    email = get_jwt_identity()
+    item_id = request.json["item_id"]
+
+    itemUser = User.query.join(Item, User.email == Item.email).filter(Item.item_id == item_id).first()
+    origin_lat = itemUser.latitude
+    origin_long = itemUser.longitude
+    proximity = itemUser.proximity
+
+    allUser = User.query.all()
+    validUsers = []
+
+    for user in allUser:
+        if user.email == email:
+            continue
+        if withinDistance(origin_lat, origin_long, user.latitude, user.longitude, proximity):
+            validUsers.append(user.email)
+
+    items = Item.query.filter(Item.email.in_(validUsers)).all()
+
+    return jsonify({"items": [item.to_json() for item in items]})
+
 #TODO: JONATHAN
 @api.route("/myposts/")
 @jwt_required()
 def getMyPosts():
     return jsonify({"Hello World!": 1})
 
+#
+# #TODO: RISHIKESH
+# @api.route("/getItems/")
+# @jwt_required()
+# def getItems():
+#     pass
 
-#TODO: RISHIKESH
-@api.route("/getItems/")
-@jwt_required()
-def getItems():
-    pass
-
-
-#TODO: RYAN
-@api.route("/changeLocation/")
-@jwt_required()
-def changeLocation():
-    pass
 
 

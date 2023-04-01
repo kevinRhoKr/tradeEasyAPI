@@ -20,18 +20,23 @@ class User(db.Model):
     def from_json(json_user):
         f_name = json_user.get("first_name")
         l_name = json_user.get("last_name")
-        location = json_user.get("location")
+        latitude = json_user.get("latitude")
+        longitude = json_user.get("longitude")
+        proximity = json_user.get("proximity")
         email = json_user.get("email")
         if f_name is None or f_name == "" or l_name is None or l_name == "":
             raise ValueError("User doesn't have a name")
-        return User(f_name=f_name, l_name=l_name, location=location, email=email)
+        return User(f_name=f_name, l_name=l_name, latitude=latitude, longitude=longitude, proximity=proximity, email=email)
 
     def to_json(self):
         json_user = {
             "email": self.email,
             "first_name": self.f_name,
             "last_name": self.l_name,
-            "location": self.location,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "proximity": self.proximity,
+            "reported": self.reported
         }
         return json_user
 
@@ -77,10 +82,9 @@ class Item(db.Model):
         email = json_item.get("email")
         name = json_item.get("name")
         description = json_item.get("description")
-        location = json_item.get("location")
         if item_id is None:
             raise ValueError("Item doesn't have an ID")
-        return Item(item_id=item_id, email=email, name=name, description=description, location=location, reported=0)
+        return Item(item_id=item_id, email=email, name=name, description=description, reported=0)
 
     def to_json(self):
         json_item = {
@@ -88,7 +92,6 @@ class Item(db.Model):
             "email": self.email,
             "name": self.name,
             "description": self.description,
-            "location": self.location,
         }
         return json_item
 
