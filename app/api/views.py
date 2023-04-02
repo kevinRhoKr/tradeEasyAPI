@@ -119,5 +119,27 @@ def getMyPosts():
 # def getItems():
 #     pass
 
+@api.route("/changeLocation", methods=["POST"])
+@jwt_required()
+def changeLocation():
+    current_user_email = get_jwt_identity()
+
+    ip_address = request.remote_addr
+    url = f"https://ipinfo.io/{ip_address}/geo"
+    response = requests.get(url)
+    location = response.json()["loc"].split(",")
+    new_latitude = location[0]
+    new_longitude = location[1]
+
+    user = User.query.filter_by(email=current_user_email).first()
+    if not user:
+        return not_found('User not found')
+
+    user.latitude = new_latitude
+    user.longitude = new_longitude
+    db.session.commit()
+
+    return jsonify({'message': 'Latitude and longitude updated successfully'})
+
 
 
