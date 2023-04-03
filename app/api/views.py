@@ -110,7 +110,10 @@ def getAppropriateItems():
 @api.route("/myposts/")
 @jwt_required()
 def getMyPosts():
-    return jsonify({"Hello World!": 1})
+    email = get_jwt_identity()
+    post_list = Item.query.filter_by(email=email).all()
+    my_posts = jsonify({"myposts": [post.to_json() for post in post_list]})
+    return my_posts
 
 #
 # #TODO: RISHIKESH
