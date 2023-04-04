@@ -5,13 +5,15 @@ from .. import db
 from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from geopy.distance import geodesic
+import random
+
 
 # TODO: Start writing the api endpoints
 # api endpoints:
-    # get all the posts that the user has created
-    # Get all the items based on the locality setting that the user has been set with
-    # Change the locality
-    # Initiate the chatting system (research more on whether this should be on the api side or on the client side)
+# get all the posts that the user has created
+# Get all the items based on the locality setting that the user has been set with
+# Change the locality
+# Initiate the chatting system (research more on whether this should be on the api side or on the client side)
 
 
 @api.route("/like", methods=["POST"])
@@ -77,8 +79,7 @@ def changeProximity():
 @api.route("/getItems")
 @jwt_required()
 def getAppropriateItems():
-
-    def withinDistance(orig_lat, orig_long, dst_lat, dst_long, proximity): # in miles
+    def withinDistance(orig_lat, orig_long, dst_lat, dst_long, proximity):  # in miles
 
         origin = (orig_lat, orig_long)
         dist = (dst_lat, dst_long)
@@ -106,11 +107,42 @@ def getAppropriateItems():
 
     return jsonify({"items": [item.to_json() for item in items]})
 
-#TODO: JONATHAN
+
+@api.route("/newPost", methods=["POST"])
+@jwt_required()
+def newItem():
+    email = get_jwt_identity()
+
+    '''
+    item_id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(320))
+    name = db.Column(db.String(30))
+    description = db.Column(db.String(200))
+    reported = db.Column(db.Integer)
+    '''
+    name = request.json["name"]
+    description = request.json["description"]
+    found_item = 1
+    id_ = 1
+
+    while found_item is not None:
+        id_ = random.randint(1, 9999)
+        found_item = Item.query.filter_by(item_id=id_).first()
+
+    new_item = Item(item_id=id_, email=email, name=name, description=description, reported=0)
+    db.session.add(new_item)
+    db.session.commit()
+
+    return jsonify(new_item.to_json())
+
+
+
+# TODO: JONATHAN
 @api.route("/myposts/")
 @jwt_required()
 def getMyPosts():
     return jsonify({"Hello World!": 1})
+
 
 #
 # #TODO: RISHIKESH
@@ -119,27 +151,24 @@ def getMyPosts():
 # def getItems():
 #     pass
 
-@api.route("/changeLocation", methods=["POST"])
-@jwt_required()
-def changeLocation():
-    current_user_email = get_jwt_identity()
-
-    ip_address = request.remote_addr
-    url = f"https://ipinfo.io/{ip_address}/geo"
-    response = requests.get(url)
-    location = response.json()["loc"].split(",")
-    new_latitude = location[0]
-    new_longitude = location[1]
-
-    user = User.query.filter_by(email=current_user_email).first()
-    if not user:
-        return not_found('User not found')
-
-    user.latitude = new_latitude
-    user.longitude = new_longitude
-    db.session.commit()
-
-    return jsonify({'message': 'Latitude and longitude updated successfully'})
-
-
-
+# @api.route("/changeLocation", methods=["POST"])
+# @jwt_required()
+# def changeLocation():
+#     current_user_email = get_jwt_identity()
+#
+#     ip_address = request.remote_addr
+#     url = f"https://ipinfo.io/{ip_address}/geo"
+#     response = requests.get(url)
+#     location = response.json()["loc"].split(",")
+#     new_latitude = location[0]
+#     new_longitude = location[1]
+#
+#     user = User.query.filter_by(email=current_user_email).first()
+#     if not user:
+#         return not_found('User not found')
+#
+#     user.latitude = new_latitude
+#     user.longitude = new_longitude
+#     db.session.commit()
+#
+#     return jsonify({'message': 'Latitude and longitude updated successfully'})
