@@ -143,8 +143,7 @@ def newItem():
 def getMyPosts():
     email = get_jwt_identity()
     post_list = Item.query.filter_by(email=email).all()
-    my_posts = jsonify({"myposts": [post.to_json() for post in post_list]})
-    return my_posts
+    return jsonify({"myposts": [post.to_json() for post in post_list]})
 
 
 #
