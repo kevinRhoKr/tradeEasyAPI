@@ -6,7 +6,7 @@ from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 
 # List of all emails linked to Administrative accounts
-VALID_ADMIN_EMAILS = ["test"]
+VALID_ADMIN_EMAILS = ["sr5361@nyu.edu"]
 
 
 @admin.route("/getReports", methods=["GET"])
@@ -35,8 +35,8 @@ def remove_user():
     user = User.query.filter_by(email=usr_email).first()
     if not user:
         return bad_request("User does not exist")
-    deletion = db.session.delete(user)
-    db.session.execute(deletion)
+    db.session.delete(user)
+    db.session.commit()
     return jsonify({'User deletion': 'Success'})
 
 
@@ -53,6 +53,6 @@ def remove_item():
     item = Item.query.filter_by(item_id=item_id).first()
     if not item:
         return bad_request("Item does not exist")
-    deletion = db.session.delete(item)
-    db.session.execute(deletion)
+    db.session.delete(item)
+    db.session.commit()
     return jsonify({'Item deletion': 'Success'})
