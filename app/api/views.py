@@ -15,6 +15,9 @@ import random
 # Change the locality
 # Initiate the chatting system (research more on whether this should be on the api side or on the client side)
 
+@api.route("/hello")
+def hello():
+    return jsonify({"Hello": "World"})
 
 @api.route("/like", methods=["POST"])
 @jwt_required()
