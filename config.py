@@ -36,3 +36,6 @@ config = {
     "production": ProductionConfig,
     "default": ProductionConfig
 }
+
+
+print("changes")
