@@ -75,6 +75,7 @@ class Item(db.Model):
     name = db.Column(db.String(30))
     description = db.Column(db.String(200))
     reported = db.Column(db.Integer)
+    image = db.Column(db.String(300))
 
     @staticmethod
     def from_json(json_item):
@@ -82,6 +83,7 @@ class Item(db.Model):
         email = json_item.get("email")
         name = json_item.get("name")
         description = json_item.get("description")
+        image = json_item.get("image")
         if item_id is None:
             raise ValueError("Item doesn't have an ID")
         return Item(item_id=item_id, email=email, name=name, description=description, reported=0)
@@ -92,6 +94,7 @@ class Item(db.Model):
             "email": self.email,
             "name": self.name,
             "description": self.description,
+            "image": self.image
         }
         return json_item
 

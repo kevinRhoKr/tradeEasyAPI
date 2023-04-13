@@ -125,6 +125,7 @@ def newItem():
     '''
     name = request.json["name"]
     description = request.json["description"]
+    image = request.json["image"]
     found_item = 1
     id_ = 1
 
@@ -132,7 +133,7 @@ def newItem():
         id_ = random.randint(1, 9999)
         found_item = Item.query.filter_by(item_id=id_).first()
 
-    new_item = Item(item_id=id_, email=email, name=name, description=description, reported=0)
+    new_item = Item(item_id=id_, email=email, name=name, description=description, reported=0, image=image)
     db.session.add(new_item)
     db.session.commit()
 
