@@ -90,9 +90,9 @@ def getAppropriateItems():
         return geodesic(origin, dist).miles < proximity
 
     email = get_jwt_identity()
-    item_id = request.json["item_id"]
+    # item_id = request.json["item_id"]
 
-    itemUser = User.query.join(Item, User.email == Item.email).filter(Item.item_id == item_id).first()
+    itemUser = User.query.filter_by(email=email).first()
     origin_lat = itemUser.latitude
     origin_long = itemUser.longitude
     proximity = itemUser.proximity
@@ -106,7 +106,7 @@ def getAppropriateItems():
         if withinDistance(origin_lat, origin_long, user.latitude, user.longitude, proximity):
             validUsers.append(user.email)
 
-    items = Item.query.filter(Item.email.in_(validUsers)).all()
+    items = Item.query.all()
 
     return jsonify({"items": [item.to_json() for item in items]})
 
