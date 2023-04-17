@@ -107,11 +107,13 @@ def getAppropriateItems():
         if withinDistance(origin_lat, origin_long, user.latitude, user.longitude, proximity):
             validUsers.append(user.email)
 
+    allMyLikes = Likes.query.filter_by(email=email).all()
+    alreadyLiked = [likes.item_id for likes in allMyLikes]
     items = Item.query.all()
     valids = []
 
     for item in items:
-        if item.email == email or item.email not in validUsers:
+        if item.email == email or item.email not in validUsers or item.item_id in alreadyLiked:
             continue
         valids.append(item)
 
@@ -165,7 +167,6 @@ def getProfile():
     lname = user.l_name
 
     return jsonify({"lastName": lname, "firstName": fname})
-
 
 #
 # #TODO: RISHIKESH
