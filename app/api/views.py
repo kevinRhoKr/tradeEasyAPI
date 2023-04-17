@@ -158,7 +158,7 @@ def getMyPosts():
     return jsonify({"myposts": [post.to_json() for post in post_list]})
 
 
-@api.route("/profile")
+@api.route("/profile", methods=["POST"])
 @jwt_required()
 def getProfile():
     email = request.json["email"]
