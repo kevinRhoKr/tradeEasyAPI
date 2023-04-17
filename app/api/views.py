@@ -19,6 +19,7 @@ import random
 def hello():
     return jsonify({"Hello": "World"})
 
+
 @api.route("/like", methods=["POST"])
 @jwt_required()
 def likeAnItem():
@@ -107,8 +108,14 @@ def getAppropriateItems():
             validUsers.append(user.email)
 
     items = Item.query.all()
+    valids = []
 
-    return jsonify({"items": [item.to_json() for item in items]})
+    for item in items:
+        if item.email == email or item.email not in validUsers:
+            continue
+        valids.append(item)
+
+    return jsonify({"items": [item.to_json() for item in valids]})
 
 
 @api.route("/newPost", methods=["POST"])
@@ -140,7 +147,6 @@ def newItem():
     return jsonify(new_item.to_json())
 
 
-
 # TODO: JONATHAN
 @api.route("/myposts/")
 @jwt_required()
@@ -148,6 +154,17 @@ def getMyPosts():
     email = get_jwt_identity()
     post_list = Item.query.filter_by(email=email).all()
     return jsonify({"myposts": [post.to_json() for post in post_list]})
+
+
+@api.route("/profile")
+@jwt_required()
+def getProfile():
+    email = request.json["email"]
+    user = User.query.filter_by(email=email).first()
+    fname = user.f_name
+    lname = user.l_name
+
+    return jsonify({"lastName": lname, "firstName": fname})
 
 
 #
