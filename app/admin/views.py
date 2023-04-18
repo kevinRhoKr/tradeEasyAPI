@@ -9,6 +9,15 @@ from flask_jwt_extended import get_jwt_identity, jwt_required
 VALID_ADMIN_EMAILS = ["sr5361@nyu.edu"]
 
 
+@admin.route("/isAdmin", methods=["GET"])
+@jwt_required()
+def getInfo():
+    email = get_jwt_identity()
+    if email in VALID_ADMIN_EMAILS:
+        return jsonify({"status": True})
+    return jsonify({"status": False})
+
+
 @admin.route("/getReports", methods=["GET"])
 @jwt_required()
 def get_reports():
