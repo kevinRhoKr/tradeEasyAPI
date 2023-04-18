@@ -32,7 +32,8 @@ def likeAnItem():
         new_like = Likes(email=email, item_id=item_id)
         db.session.add(new_like)
         db.session.commit()
-        return jsonify(new_like.to_json())
+        creator = item.email
+        return jsonify({"email": email, "item_id": item_id, "creator": creator})
 
     return bad_request("Cannot find a particular item with the given item ID")
 
