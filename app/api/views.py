@@ -172,7 +172,6 @@ def getProfile():
     return jsonify({"lastName": lname, "firstName": fname})
 
 
-
 @api.route('/sendemail', methods=["PUT"])
 def sendemail():
     email = request.json["email"]
