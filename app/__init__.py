@@ -2,11 +2,11 @@ from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 from flask_jwt_extended import JWTManager
-# from flask_mail import Mail
+from flask_mail import Mail
 
 db = SQLAlchemy()
 jwt = JWTManager()
-# mail = Mail()
+mail = Mail()
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -15,7 +15,7 @@ def create_app(config_name):
 
     db.init_app(app)
     jwt.init_app(app)
-    # mail.init_app(app)
+    mail.init_app(app)
 
     # from .main import main as main_blueprint
     # app.register_blueprint(main_blueprint)
