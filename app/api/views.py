@@ -1,6 +1,6 @@
 from . import api
 from ..models import User, Item, Conversation, Likes
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, render_template_string
 from .. import db
 from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
@@ -26,15 +26,35 @@ def hello():
 @jwt_required()
 def likeAnItem():
     item_id = request.json["item_id"]
-
     item = Item.query.filter_by(item_id=item_id).first()
 
     if item:
         email = get_jwt_identity()
+        user = User.query.filter_by(email=email).first()
         new_like = Likes(email=email, item_id=item_id)
         db.session.add(new_like)
         db.session.commit()
+
         creator = item.email
+        item_name = item.name
+        item_pic = item.image
+        user_name = user.f_name
+
+        #send email notificaiton
+        header = "Your item,  " + item_name + " has been liked by "+user_name
+        html_message = render_template_string('''
+                    <html>
+                        <body>
+                            <h1>Item Liked</h1>
+                            <p>Your item, {{ item_name }}, has been liked by {{ user_name}}. </p>
+                            <img src="{{ item_pic }}" alt="Item Image">
+                        </body>
+                    </html>
+                ''', item_name=item_name, user_name = user_name,item_pic=item_pic)
+
+        itemLike = Message(header, recipients=[creator], html=html_message)
+        mail.send(itemLike)
+
         return jsonify({"email": email, "item_id": item_id, "creator": creator})
 
     return bad_request("Cannot find a particular item with the given item ID")
@@ -46,8 +66,26 @@ def reportItem():
     item_id = request.json["item_id"]
     Item.query.filter_by(item_id=item_id).update(dict(reported=1))
     db.session.commit()
+    item = Item.query.filter_by(item_id=item_id).first()
+    creator = item.email
+    item_name = item.name
+    item_pic = item.image
 
-    return jsonify({'Reported item': 'Success'})
+    #send email to reported
+    header = "Your item,  "+ item_name+" has been reported"
+    html_message = render_template_string('''
+            <html>
+                <body>
+                    <h1>Item Reported</h1>
+                    <p>Your item, {{ item_name }}, has been reported. Please contact customer service.</p>
+                    <img src="{{ item_pic }}" alt="Item Image">
+                </body>
+            </html>
+        ''', item_name=item_name, item_pic=item_pic)
+
+    itemreport = Message(header, recipients=[creator], html=html_message)
+    mail.send(itemreport)
+    return jsonify({'item_id': item_id ,'creator' : creator, 'item_name' : item_name,'item_pic':item_pic})
 
 
 @api.route("/reportUser", methods=["PUT"])
@@ -56,6 +94,19 @@ def reportUser():
     email = request.json["email"]
     User.query.filter_by(email=email).update(dict(reported=1))
     db.session.commit()
+
+    header = "ATTENTION, your Account has been Reported!"
+    html_message = render_template_string('''
+               <html>
+                   <body>
+                       <h1>Account Reported</h1>
+                       <p>Your account has been reported. Please contact customer service.</p>
+                   </body>
+               </html>
+           ''')
+
+    msg = Message(header, recipients=[email], html=html_message)
+    mail.send(msg)
 
     return jsonify({'Reported user': 'Success'})
 
@@ -149,6 +200,7 @@ def newItem():
     db.session.add(new_item)
     db.session.commit()
 
+
     return jsonify(new_item.to_json())
 
 
@@ -180,6 +232,20 @@ def sendemail():
     msg = Message(header, recipients=[email], html=html_message)
     mail.send(msg)
     return jsonify({"Msg": "email sent success"})
+
+@api.route('/getuserdetails')
+@jwt_required()
+def getuserdetails():
+    email = get_jwt_identity()
+    user = User.query.filter_by(email=email).first()
+    f_name = user.f_name
+    l_name = user.l_name
+    lat = user.latitude
+    lon = user.longitude
+    proximity = user.proximity
+
+    return jsonify({"email": email,"f_name":f_name,"l_name":l_name,"lat":lat,"lon":lon,"proximity":proximity})
+
 #
 # #TODO: RISHIKESH
 # @api.route("/getItems/")
