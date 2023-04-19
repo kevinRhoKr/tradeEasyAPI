@@ -20,6 +20,7 @@ def getAll():
 
 @auth.route("/login", methods=["POST"])
 def login_call():
+    # print("here");
     email = request.json.get("inputObj").get("email", None)
     password = request.json.get("inputObj").get("password", None)
     # if username != "test" or password != "test":
