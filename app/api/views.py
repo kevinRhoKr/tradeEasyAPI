@@ -35,9 +35,66 @@ def likeAnItem():
         db.session.add(new_like)
         db.session.commit()
         creator = item.email
+
+        # get all the likes that the creator has liked
+        # check whether the items that the creator has liked is my item.
+
+        items = {}
+        allItems = Item.query.filter_by(email=email).all()
+        for obj in allItems:
+            items[obj.item_id] = 0
+
+        creator_likes = Likes.query.filter_by(email=creator).all()
+
+        for like in creator_likes:
+            if like.item_id in items:
+                # create new conversation! if not already there.
+                conv1 = Conversation.query.filter_by(email1=email, email2=creator).first()
+                conv2 = Conversation.query.filter_by(email1=creator, email2=email).first()
+                print(conv1)
+                print(conv2)
+                if conv1 is None and conv2 is None:
+
+                    found_Conv = 1
+                    id_ = 1
+
+                    while found_Conv is not None:
+                        id_ = random.randint(1, 9999)
+                        found_Conv = Conversation.query.filter_by(chat_id=id_).first()
+
+                    new_conversation = Conversation(chat_id=id_, email1=email, email2=creator, item_id=item_id)
+                    db.session.add(new_conversation)
+                    db.session.commit()
+
+                break
+
         return jsonify({"email": email, "item_id": item_id, "creator": creator})
 
     return bad_request("Cannot find a particular item with the given item ID")
+
+
+@api.route("/chats", methods=["GET"])
+@jwt_required()
+def getAllChats():
+    email = get_jwt_identity()
+
+    conv1 = Conversation.query.filter_by(email1=email).all()
+    conv2 = Conversation.query.filter_by(email2=email).all()
+
+    lst1 = []
+    lst2 = []
+
+    if conv1:
+        lst1 = [ch1.to_json() for ch1 in conv1]
+    if conv2:
+        lst2 = [ch2.to_json() for ch2 in conv2]
+
+    lst1.extend(lst2)
+
+    return jsonify({'chats': lst1})
+
+
+
 
 
 @api.route("/reportItem", methods=["PUT"])
