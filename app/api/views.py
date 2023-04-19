@@ -91,7 +91,18 @@ def getAllChats():
 
     lst1.extend(lst2)
 
-    return jsonify({'chats': lst1})
+    for i in range(len(lst1)):
+        if lst1[i]["email1"] == email:
+            usr1 = User.query.filter_by(email=lst1[i]["email2"]).first()
+        else:
+            usr1 = User.query.filter_by(email=lst1[i]["email1"]).first()
+
+        lst1[i]["name"] = {"f_name": usr1.f_name, "l_name": usr1.l_name}
+
+    me = User.query.filter_by(email=email).first()
+    my_info = {"email": email, "f_name": me.f_name, "l_name": me.l_name}
+
+    return jsonify({'chats': lst1, 'me': my_info})
 
 
 
