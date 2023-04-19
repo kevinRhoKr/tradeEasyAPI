@@ -6,8 +6,8 @@ from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
 from geopy.distance import geodesic
 import random
-from flask_mail import Message
-from app import mail
+# from flask_mail import Message
+# from app import mail
 
 
 # TODO: Start writing the api endpoints
@@ -170,17 +170,17 @@ def getProfile():
     lname = user.l_name
 
     return jsonify({"lastName": lname, "firstName": fname})
-
-
-@api.route('/sendemail', methods=["PUT"])
-def sendemail():
-    email = request.json["email"]
-    header = request.json["header"]
-    html_message = request.json["html_message"]
-    msg = Message(header, recipients=[email], html=html_message)
-    mail.send(msg)
-    return jsonify({"Msg": "email sent success"})
 #
+#
+# @api.route('/sendemail', methods=["PUT"])
+# def sendemail():
+#     email = request.json["email"]
+#     header = request.json["header"]
+#     html_message = request.json["html_message"]
+#     msg = Message(header, recipients=[email], html=html_message)
+#     mail.send(msg)
+#     return jsonify({"Msg": "email sent success"})
+# #
 # #TODO: RISHIKESH
 # @api.route("/getItems/")
 # @jwt_required()
