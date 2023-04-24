@@ -1,9 +1,11 @@
 from . import admin
 from ..models import User, Item, Conversation, Likes
-from flask import jsonify, request, url_for
+from flask import jsonify, request, url_for, render_template_string
 from .. import db
 from ..errors import unauthorized, not_found, forbidden, bad_request
 from flask_jwt_extended import get_jwt_identity, jwt_required
+from flask_mail import Message
+from app import mail
 
 # List of all emails linked to Administrative accounts
 VALID_ADMIN_EMAILS = ["sr5361@nyu.edu"]
@@ -44,8 +46,41 @@ def remove_user():
     user = User.query.filter_by(email=usr_email).first()
     if not user:
         return bad_request("User does not exist")
+    # Remove all items related to the user
+    items = Item.query.filter_by(email=usr_email).all()
+    for item in items:
+        db.session.delete(item)
+
+    # Remove all likes related to the user
+    likes = Likes.query.filter_by(email=usr_email).all()
+    for like in likes:
+        db.session.delete(like)
+
+    # Remove all chats related to the user
+    conversations1 = Conversation.query.filter_by(email1=usr_email).all()
+    conversations2 = Conversation.query.filter_by(email2=usr_email).all()
+    conversations = conversations1 + conversations2
+    for conversation in conversations:
+        db.session.delete(conversation)
     db.session.delete(user)
     db.session.commit()
+
+    #send email notificaiton to the user.
+    header = "Your account has been deleted"
+    html_message = render_template_string('''
+                        <html>
+                            <body>
+                                <h1>Account Deleted</h1>
+                                <p>Your account has been deleted. After review by our 
+                                team and from user reports, we have suspended your account 
+                                and deleted all data. </p>
+                            </body>
+                        </html>
+                    ''')
+
+    msg = Message(header, recipients=[usr_email], html=html_message)
+    mail.send(msg)
+
     return jsonify({'User deletion': 'Success'})
 
 

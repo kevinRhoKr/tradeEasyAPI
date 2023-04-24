@@ -15,15 +15,16 @@ class Config:
     MAIL_SERVER = 'smtp-relay.sendinblue.com'
     MAIL_PORT = 2525
     # MAIL_USE_TLS = True
-    MAIL_USERNAME = 'tradeasynotifs@gmail.com'
-    MAIL_PASSWORD = 'ZNVhb8UfFA2H5EsW'
-    MAIL_DEFAULT_SENDER = 'tradeasynotifs@gmail.com'
+    MAIL_USERNAME = 'tradeasynotifs@yahoo.com'
+    MAIL_PASSWORD = 'vK4tfhjHPa2ZEIWr'
+    MAIL_DEFAULT_SENDER = 'tradeasynotifs@yahoo.com'
     # MAIL_SERVER = 'sandbox.smtp.mailtrap.io'
     # MAIL_PORT = 2525
     # MAIL_USERNAME = '2f9b315d5925d7'
     # MAIL_PASSWORD = '6a53c14cbefa25'
     # MAIL_USE_TLS = True
     # MAIL_USE_SSL = False
+
 
     @staticmethod
     def init_app(app):
