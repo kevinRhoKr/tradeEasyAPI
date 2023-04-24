@@ -126,9 +126,6 @@ def getAllChats():
     return jsonify({'chats': lst1, 'me': my_info})
 
 
-
-
-
 @api.route("/reportItem", methods=["PUT"])
 @jwt_required()
 def reportItem():
