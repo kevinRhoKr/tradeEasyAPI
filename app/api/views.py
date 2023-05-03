@@ -266,7 +266,6 @@ def newItem():
     db.session.add(new_item)
     db.session.commit()
 
-
     return jsonify(new_item.to_json())
 
 
